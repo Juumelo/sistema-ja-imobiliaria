@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
 
     // In a real application, integrate with an email service
     const emailContent = {
-      to: process.env.ADMIN_EMAIL || "admin@imobiliaria.com",
+      to: process.env.ADMIN_EMAIL || "jullyanaglaucia@gmail.com",
       subject: `Novo Anúncio Submetido: ${title}`,
       html: `
         <h2>Novo Anúncio de Imóvel Recebido</h2>
