@@ -7,6 +7,7 @@ import { Building2, MapPin, Bed, Bath, Maximize, ArrowLeft } from "lucide-react"
 import { notFound } from "next/navigation"
 import { ContactForm } from "@/components/contact-form"
 import LogoHorizontal from "@/components/icons/logoHoriontal"
+import PropertyGallery from "@/components/images/propertyGallery"
 
 export default async function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -53,35 +54,8 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
 
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-6">
-            {/* Images */}
-            {property.images && property.images.length > 0 ? (
-              <div className="space-y-4">
-                <div className="aspect-video w-full overflow-hidden rounded-lg bg-muted">
-                  <img
-                    src={property.images[0] || "/placeholder.svg"}
-                    alt={property.title}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                {property.images.length > 1 && (
-                  <div className="grid grid-cols-3 gap-4">
-                    {property.images.slice(1, 4).map((image:string, index: number) => (
-                      <div key={index} className="aspect-video w-full overflow-hidden rounded-lg bg-muted">
-                        <img
-                          src={image || "/placeholder.svg"}
-                          alt={`${property.title} ${index + 2}`}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="aspect-video w-full rounded-lg bg-muted flex items-center justify-center">
-                <Building2 className="h-16 w-16 text-muted-foreground" />
-              </div>
-            )}
+              <PropertyGallery property={property} />
+            
 
             {/* Details */}
             <Card>
@@ -105,7 +79,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                 </div>
 
                 <div className="flex items-center gap-6 py-4 border-y">
-                  {property.bedrooms && (
+                  {property.bedrooms > 0 && (
                     <div className="flex items-center gap-2">
                       <Bed className="h-5 w-5 text-muted-foreground" />
                       <div>
@@ -114,7 +88,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                       </div>
                     </div>
                   )}
-                  {property.bathrooms && (
+                  {property.bathrooms > 0 && (
                     <div className="flex items-center gap-2">
                       <Bath className="h-5 w-5 text-muted-foreground" />
                       <div>
@@ -123,7 +97,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                       </div>
                     </div>
                   )}
-                  {property.area_sqm && (
+                  {property.area_sqm > 0 && (
                     <div className="flex items-center gap-2">
                       <Maximize className="h-5 w-5 text-muted-foreground" />
                       <div>

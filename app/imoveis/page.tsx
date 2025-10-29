@@ -112,19 +112,19 @@ export default async function PropertiesPage({
                       </div>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      {property.bedrooms && (
+                      {property.bedrooms > 0 && (
                         <div className="flex items-center gap-1">
                           <Bed className="h-4 w-4" />
                           <span>{property.bedrooms}</span>
                         </div>
-                      )}
-                      {property.bathrooms && (
+                      ) }
+                      {property.bathrooms > 0 && (
                         <div className="flex items-center gap-1">
                           <Bath className="h-4 w-4" />
                           <span>{property.bathrooms}</span>
                         </div>
                       )}
-                      {property.area_sqm && (
+                      {property.area_sqm > 0 && (
                         <div className="flex items-center gap-1">
                           <Maximize className="h-4 w-4" />
                           <span>{property.area_sqm}m²</span>

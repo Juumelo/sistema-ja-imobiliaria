@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
@@ -37,7 +37,10 @@ export function PropertyForm({ property }: PropertyFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [uploadingImages, setUploadingImages] = useState(false)
+  const [uploadingImages, setUploadingImages] = useState(false) 
+  const [locationInput, setLocationInput] = useState("")
+  const [suggestions, setSuggestions] = useState<any[]>([])
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(false)
 
   const [formData, setFormData] = useState({
     title: property?.title || "",
@@ -98,6 +101,36 @@ export function PropertyForm({ property }: PropertyFormProps) {
       images: prev.images.filter((_, i) => i !== index),
     }))
   }
+
+useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (locationInput.trim().length < 3) {
+        setSuggestions([])
+        return
+      }
+
+      setIsLoading(true)
+      fetch(
+        `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(
+          locationInput
+        )}&apiKey=${process.env.NEXT_PUBLIC_GEOAPIFY_API_KEY}&limit=5`
+      )
+        .then((response) => response.json())
+        .then((result) => {
+          setSuggestions(result.features || [])
+        })
+        .catch((error) => console.error("Erro ao buscar locais:", error))
+        .finally(() => setIsLoading(false))
+      }, 100) 
+        return () => clearTimeout(delayDebounce)
+      }, [locationInput])
+
+    const handleSelect = (suggestion: any) => {
+      setLocationInput(suggestion.properties.formatted)
+      setFormData({ ...formData, location: suggestion.properties.formatted })
+      setSuggestions([])
+      setShowSuggestions(false)
+    }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -208,16 +241,38 @@ export function PropertyForm({ property }: PropertyFormProps) {
             </div>
 
             <div className="grid gap-2">
+              <div className="grid gap-2">
+
               <Label htmlFor="location">Localização</Label>
               <Input
                 id="location"
                 required
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                value={locationInput}
+                onChange={(e) =>           
+                  {setLocationInput(e.target.value)
+                  
+                  setShowSuggestions(true)}}
+                autoComplete="off"
                 placeholder="Ex: Centro, São Paulo - SP"
               />
-            </div>
+              </div>
+              <div>
 
+            {showSuggestions && suggestions.length > 0 && (
+              <ul className="absolute z-10  bg-white border rounded-lg shadow max-h-60 overflow-auto">
+                {suggestions.map((sug, index) => (
+                  <li
+                    key={index}
+                    onClick={() => handleSelect(sug)}
+                    className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                  >
+                    {sug.properties.formatted}
+                  </li>
+                ))}
+              </ul>
+            )}
+              </div>
+            </div>
             <div className="grid gap-4 md:grid-cols-3">
               <div className="grid gap-2">
                 <Label htmlFor="bedrooms">Quartos</Label>
